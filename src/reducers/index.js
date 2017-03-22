@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
-import { Lib, merged } from '../lib/lib'
 import action from '../actions'
+import { Lib,merged } from '../../src/lib/lib'
 
 var defaultState = {
 	defaults: {
@@ -16,9 +16,9 @@ var defaultState = {
 }
 
 /**
- * 存储用户信息 signIn/signout/Userinfo 相关
+ * 存储用户信息 signIn/signout/Userinfo 相关,这样话每次刷新，数据不会丢失，本地持久化存储
  */
-function postUser(state = JSON.parse(Lib.getLocalStorge('User')) || {},action) {
+function postUser(state = JSON.parse(Lib.getLocalStorge('User')),action) {
 	switch(action.type) {
 		case 'SIGN_IN_SUCCESS':
 			Lib.setLocalStorge('User',JSON.stringify(action.data)); //登录进去，添加信息
@@ -31,10 +31,9 @@ function postUser(state = JSON.parse(Lib.getLocalStorge('User')) || {},action) {
 	}
 }
 /**
- * []
- * @param  {[type]} defaultState [description]
- * @param  {[type]} action       [description]
- * @return {[type]}              [description]
+ * [存储数据，与IndexList,Topic... 列表展示相关]
+ * @param  {[type]} defaultState [默认值]
+ * @param  {[type]} action       [action]
  */
 function postData(state = defaultState,action) {
 	switch(action.type) {

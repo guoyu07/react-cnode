@@ -2,7 +2,7 @@ import React, { Component,PropTypes } from 'react';
 import { connect } from 'react-redux';
 import action from '../actions';
 import { Lib, merged } from '../lib/lib'
-import {  Header } from './common/index';
+import { Header } from './common/index';
 
 
 class SignIn extends Component {

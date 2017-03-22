@@ -1,5 +1,5 @@
 import merged from 'obj-merged';
-
+// 开发环境由于做了代理，数据请求还是发到了cnodejs.org
 const env = process.env.NODE_ENV !== 'production' ? '' : 'https://cnodejs.org';
 const Lib = {};
 
@@ -11,7 +11,7 @@ const Lib = {};
 Lib.ajax = function(options) {
 
  	var defaultOptions = {
- 		url: window.location.pathname,
+ 		url: window.location.pathname,//(端口后面字符串)url
  		async: true, //默认异步
  		type: 'GET', //默认GET请求
  		data: {}, //发送给服务器的数据
@@ -34,7 +34,8 @@ Lib.ajax = function(options) {
  	sData = pData.join('&');
  	defaultOptions.type = options.type.toUpperCase();
 
- 	var xhr = new XMLHttpRequest();
+  //我们使用XMLHttpRequest对象来发送一个Ajax请求
+ 	var xhr = new XMLHttpRequest(); //这里没有考虑IE8,9，IE10，11 部分支持，不支持xhr.responseType为json
  	try{
  		if(defaultOptions.type === 'GET') {
  			sData = defaultOptions.url + '?' + sData;
@@ -49,26 +50,31 @@ Lib.ajax = function(options) {
  		//放弃请求
  		xhr.abort();
  	}
+
+
  	//判断是否异步
  	if(defaultOptions.async) {
+    //xhr.onreadystatechange = function() {} 
+    //监听事件，默认false冒泡，true为捕获，这个经常搞混
  		xhr.addEventListener('readystatechange', httpEnd, false);
  	} else { //同步
  		httpEnd();
  	}
-    //移除监听事件
+  //移除监听事件,end()为自定义方法
  	xhr.end = function() {
  		xhr.removeEventListener('readystatechange', httpEnd, false);
  	}
 
  	function httpEnd() {
  		if(xhr.readyState === 4) {
- 			var header = xhr.getAllResponseHeaders();
- 			var response = xhr.responseText;
+      xhr.end();
+ 			var header = xhr.getAllResponseHeaders(); //header
+ 			var response = xhr.responseText; //body
  			//将服务器返回的数据转回为json 数据
  			if(/application\/json/.test(header) || defaultOptions.dataType === 'json' && /^(\{|\[)([\s\S])*?(\]|\})$/.test(response)) {
  				response = JSON.parse(response);
  			}
- 			if((xhr.status >= 200 && xhr.status <= 300) || xhr.status == 304) {
+ 			if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
  				defaultOptions.success(response, defaultOptions, xhr);
  			} else {
  				defaultOptions.error(defaultOptions, xhr);
@@ -91,10 +97,10 @@ Lib.ajax = function(options) {
  	return xhr;
 }
 
- /**
-  * ajax post 请求封装
-  * 
-  */
+/**
+* ajax post 请求封装
+* 
+*/
 Lib.post = function(url,data,success,error) {
   	var options = {
   		url: env + url,
@@ -105,10 +111,10 @@ Lib.post = function(url,data,success,error) {
   	};
   	return Lib.ajax(options);
 }
- /**
-  * ajax get 请求封装
-  * 
-  */
+/**
+* ajax get 请求封装
+* 
+*/
 Lib.get = function(url,data,success,error) {
   	var options = {
   		url: env + url,
@@ -120,10 +126,10 @@ Lib.get = function(url,data,success,error) {
   	return Lib.ajax(options);
 }
 
- /**
-  * 格式化时间
-  * 
-  */
+/**
+* 格式化时间
+* 
+*/
 Lib.formatDate = function(string) {
   	var date = new Date(string);
   	var time = (new Date().getTime() - date.getTime())/1000; //相差时间，单位秒
@@ -143,14 +149,14 @@ Lib.formatDate = function(string) {
   		return parseInt(time/31536000) + '年前'
   	}
 }
- /**
-  * localstorge 存储封装
-  */
+/**
+* localstorge 存储封装
+*/
 Lib.setLocalStorge = function(key,value) {
- 		return localStorage.setItem(key,value);
+ 	return localStorage.setItem(key,value);
 }
 Lib.getLocalStorge = function(key) {
-        return localStorage.getItem(key);
+  return localStorage.getItem(key);
 }
 Lib.removeLocalStorge = function(key) {
  	if(key) {

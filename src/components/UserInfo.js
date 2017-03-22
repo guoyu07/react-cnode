@@ -33,28 +33,26 @@ class UserInfo extends Component {
 	    		//this.props.SET_STATE(this.state);
 	    	},(res,xhr) => { 
 	    		if (xhr.status == 404) { 
-	    		    this.state.loadMsg = '用户不存在';
+	    		    this.setState({loadMsg: '用户不存在',loadAnimation: false});
 	    		} else {
-	    		    this.state.loadMsg = '加载失败';
+	    		    this.setState({data: res.data,loadMsg: '加载失败',loadAnimation: false});
 	    		}
-	    		this.state.loadAnimation = false;
 	    		//dispatch 改变状态
 	    		//this.props.SET_STATE(this.state);
 	    	});
 	    };
-	    // /**
-	    //  * [卸载组件之前一些操作]
-	    //  * @return {[type]} [description]
-	    //  */
-	    // this.unMount = () => {
-	    // 	//记录滚动条的位置
-	    // 	this.state.scrollX = window.scrollX;
-	    // 	this.state.scrollY = window.scrollY;
-	    // 	//dispatch 改变状态
-	    // 	this.props.SET_STATE(this.state);
-	    // }
+	    /**
+	     * [卸载组件之前一些操作]
+	     * @return {[type]} [description]
+	     */
+	    this.unMount = () => {
+	    	//记录滚动条的位置
+	    	this.state.scrollX = window.scrollX;
+	    	this.state.scrollY = window.scrollY;
+	    	//dispatch 改变状态
+	    	this.props.SET_STATE(this.state);
+	    }
 	    this.tab = (tabIndex) => {
-	        //this.state.tabIndex = tabIndex;
 	        this.setState({tabIndex: tabIndex});
 	        //this.props.SET_STATE(this.state);
 	    }
@@ -105,7 +103,7 @@ class UserInfo extends Component {
 
 	render() {
 		
-		var { data, loadAnimation, loadMsg, tabIndex } = this.state;
+		var { data, loadAnimation, loadMsg, tabIndex = 0 } = this.state;
 		var { User, params } = this.props;
 		User = User ? User : {};
 		var main = data ? <Home data={data} tabIndex={tabIndex} tab={this.tab} />: <DataLoad loadAnimation={loadAnimation} loadMsg={loadMsg} />;

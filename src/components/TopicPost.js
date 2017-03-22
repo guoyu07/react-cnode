@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import action from '../actions';
 import { Lib, merged } from '../lib/lib';
-import { DataLoad, DataNull, Header, TipMsgSignIn, Footer } from './common/index';
+import { Header, TipMsgSignIn, Footer } from './common/index';
 
 
 class TopicPost extends Component {
@@ -11,7 +11,6 @@ class TopicPost extends Component {
 		super(props);
 		/**
 		 * 初始化组件状态
-		 * @type {Object}
 		 */
 		this.state = {
 			tab: '',

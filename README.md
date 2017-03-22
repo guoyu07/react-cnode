@@ -6,3 +6,51 @@
 4. 我改写的基本是最原始，与我最开始接触的redux，react-router,react写法一致
 5. 相比较原始的ajax，接触到的也是fetch API，准备在进行一次改造（redux-thunk）根本没有起作用（进行中）
 6. 重新设计一下redux（进行中）
+
+
+
+#### 知识点
+
+1. ES6 module 
+
+```export与export default
+   //export class IndexList extends Component{}
+   导出
+   import { IndexList } from './index.js'
+   //export  default class IndexList extends Component{}
+   导出
+   import IndexList/anyName from './index.js'
+
+   2. import IndexList from './common'
+   这种写法会自动去寻找 common 目录下 index 文件，(后缀省略是在webpack里面配置的)
+   resolve: {
+       extensions: ['', '.js', '.jsx'], //后缀名自动补全
+   }
+```
+
+2. react的几种写法区别
+
+```
+
+```
+
+3. 路由按需加载
+
+```
+```
+
+4. webpack 1.0 配置
+
+```
+```
+
+5. flex 布局
+
+```
+```
+
+6. 获取下一页数据
+
+```
+```
+ 

@@ -26,25 +26,26 @@ class MyMessage extends Component {
 			var data = this.reqData(props);
 			var {scrollX, scrollY} = this.state;
 			window.scrollTo(scrollX, scrollY); //设置滚动条位置
-			if(data.accesstoken == undefined || data.accesstoken == '') {
-				this.props.SIGN_OUT();
+			if(data.accesstoken == '') {
 				return false; //拦截请求
 			}
-			//return false;
 			var options = {
 				type: 'GET',
 				url: '/api/v1/messages',
 				data: data
 			};
 			Lib.get(options.url,options.data,(res) => {
-				this.setState({data: res.data,loadMsg: '加载成功',loadAnimation: false});
+				if(res.success) {
+					this.setState({data: res.data,loadMsg: '加载成功',loadAnimation: false});
+				} else {
+					this.setState({loadMsg: '加载失败',loadAnimation: false});
+				}
 			},(res,xhr) => { 
 				if (xhr.status == 404) {
 				    this.setState({loadMsg: '消息不存在',loadAnimation: false});
 				} else {
 					this.setState({loadMsg: '加载失败',loadAnimation: false});
 				}
-				//this.state.loadAnimation = false;
 				//dispatch 改变状态
 				//this.props.SET_STATE(this.state);
 			});
@@ -62,7 +63,7 @@ class MyMessage extends Component {
 			this.state.scrollX = window.scrollX;
 			this.state.scrollY = window.scrollY;
 			//dispatch 改变状态
-			//this.props.SET_STATE(this.state);
+			this.props.SET_STATE(this.state);
 		}
 		this.initState(this.props);
 	}
@@ -74,39 +75,39 @@ class MyMessage extends Component {
 		//render之后 获取数据
 		this.getData(this.props, this.state);
 	}
-	/**
-	 * [componentWillReceiveProps description]
-	 * @param  {[type]} np [description]
-	 * @return {[type]}    [description]
-	 */
-	componentWillReceiveProps(np) {
-	    var { location } = np;
-	    var { pathname, search } = location;
-	    var path = pathname + search;
-	    if (this.path !== path) {
-	        this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
-	    }
-	    this.initState(np);
-	}
-	/**
-	 * [componentDidUpdate description]
-	 * @return {[type]} [description]
-	 */
-	componentDidUpdate() {
-		//组件更新之后重新获取数据
-	    //this.getData();
-	}
-	/**
-	 * [componentWillUnmount description]
-	 * @return {[type]} [description]
-	 */
-	componentWillUnmount() {
-	    this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
-	}
+	// /**
+	//  * [componentWillReceiveProps description]
+	//  * @param  {[type]} np [description]
+	//  * @return {[type]}    [description]
+	//  */
+	// componentWillReceiveProps(np) {
+	//     var { location } = np;
+	//     var { pathname, search } = location;
+	//     var path = pathname + search;
+	//     if (this.path !== path) {
+	//         this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
+	//     }
+	//     this.initState(np);
+	// }
+	// /**
+	//  * [componentDidUpdate description]
+	//  * @return {[type]} [description]
+	//  */
+	// componentDidUpdate() {
+	// 	//组件更新之后重新获取数据
+	//     //this.getData();
+	// }
+	// /**
+	//  * [componentWillUnmount description]
+	//  * @return {[type]} [description]
+	//  */
+	// componentWillUnmount() {
+	//     this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
+	// }
 
 	render() {
-		var { data,loadAnimation, loadMsg, id, tabIndex } = this.state;
-		var { User, params } = this.props;
+		var { data,loadAnimation,loadMsg,id,tabIndex } = this.state;
+		var { User,params } = this.props;
 		var main = null;
 		if(!User) {
 			main = <TipMsgSignIn />;

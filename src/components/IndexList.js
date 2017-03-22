@@ -75,17 +75,6 @@ class IndexList extends Component {
 			    mdrender
 			}
 		}
-		/**
-		 * 卸载之后的一些操作
-		 * @return {[type]} [description]
-		 */
-		this.unMount = () => {
-			//记录滚动条的位置
-			this.state.scrollX = window.scrollX;
-			this.state.scrollY = window.scrollY;
-			//dispatch 改变状态
-			//this.props.SET_STATE(this.state);
-		};
 		this.initState(this.props);
 	}
 	/**
@@ -105,27 +94,11 @@ class IndexList extends Component {
 	    var { pathname, search } = location;
 	    var path = pathname + search;
 	    if (this.path !== path) {
-	        //this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
+	        //地址栏已经发生改变，重新加载数据
 	        this.getData(np,this.state);
-	        
 	    }
-	    //this.initState(np);
 	}
-	/**
-	 * [componentDidUpdate description]
-	 * @return {[type]} [description]
-	 */
-	componentDidUpdate() {
-		//组件更新之后重新获取数据
-	    //this.getData(this.props,this.state);
-	}
-	/**
-	 * [componentWillUnmount description]
-	 * @return {[type]} [description]
-	 */
-	componentWillUnmount() {
-	    this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
-	}
+
 
 	render() {
 		var { data, loadAnimation, loadMsg } = this.state;
@@ -151,7 +124,6 @@ class Nav extends Component {
 	render() {
 		var setCur = {};
 		setCur[this.props.tab] = 'on';
-		console.log(this.props.tab);
 		return (
 			<nav className="index-nav">
 				<ul data-flex="box:mean">
