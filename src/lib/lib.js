@@ -166,6 +166,6 @@ Lib.removeLocalStorge = function(key) {
  	}
 }
 
-export { Lib, merged }
+export { Lib, merged, env }
 
 

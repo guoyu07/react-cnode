@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import action from '../actions';
-import { Lib, merged } from '../lib/lib';
+import { Lib, merged, env } from '../lib/lib';
 import { DataLoad, Footer, UserHeadImg, TabIcon } from './common/index';
 import GetNextPage from 'get-next-page';
 /**
@@ -24,40 +24,50 @@ class IndexList extends Component {
 	        this.state.path = this.path;
 	        this.state.page = 1;
 	        this.state.limit = 10;
+	        this.state.data = [];
 		};
 		/**
 		 * 发送请求
 		 * @return {[type]} [description]
 		 */
 		this.getData = (props,state) => {
+			var {scrollX, scrollY} = this.state;
+			window.scrollTo(scrollX, scrollY); //设置滚动条位置
 			var data = this.reqData(props,state);
 			var options = {
 				type: 'GET', //请求类型
 				url: '/api/v1/topics', //请求地址
 				data: data
 			};
-			Lib.get(options.url,options.data,(res) => {
-				this.setState({
-					loadMsg: '加载成功',
-					loadAnimation: false,
-					data: res.data
-				});
-				//dispatch 改变状态
-				//this.props.SET_STATE(this.state);
-			},(res,xhr) => {
-				if (xhr.status == 404) {
-				    this.setState({
-				    	loadMsg: '话题不存在',
-				    	loadAnimation: false,
-				    });
-				} else {
-				    this.setState({
-				    	loadMsg: '加载失败',
-				    	loadAnimation: false,
-				    });
-				}
-				//dispatch 改变状态
-				//this.props.SET_STATE(this.state);
+			// Lib.get(options.url,options.data,(res) => {
+			// 	this.setState({
+			// 		loadMsg: '加载成功',
+			// 		loadAnimation: false,
+			// 		data: res.data
+			// 	});
+			// 	//dispatch 改变状态
+			// 	//this.props.SET_STATE(this.state);
+			// },(res,xhr) => {
+			// 	if (xhr.status == 404) {
+			// 	    this.setState({
+			// 	    	loadMsg: '话题不存在',
+			// 	    	loadAnimation: false,
+			// 	    });
+			// 	} else {
+			// 	    this.setState({
+			// 	    	loadMsg: '加载失败',
+			// 	    	loadAnimation: false,
+			// 	    });
+			// 	}
+			// 	//dispatch 改变状态
+			// 	//this.props.SET_STATE(this.state);
+			// });
+			this.get = new GetNextPage(this.refs.dataload, {
+			    url: env + options.url,
+			    data: options.data,
+			    start: this.start,
+			    load: this.load,
+			    error: this.error
 			});
 		};
 		/**
@@ -74,6 +84,55 @@ class IndexList extends Component {
 			    limit,
 			    mdrender
 			}
+		}
+		/**
+		 * 请求开始
+		 */
+		this.start = () => {
+	    	this.setState({
+	    		loadMsg: '正在加载中...',
+	    		loadAnimation: true
+	    	});
+		}
+		/**
+		 * 下一页加载成功
+		 * 
+		 * @param {Object} res
+		 */
+		this.load = (res) => {
+		    var { state } = this;
+		    var { data } = res;
+		    if (!data.length && data.length < before.limit) {
+		        this.setState({
+		        	loadMsg: '没有了',
+		        	loadAnimation: false,
+		        	nextBtn: false
+		        });
+		    } else {
+		        this.setState({
+		        	loadMsg: '上拉加载更多',
+		        	loadAnimation: false,
+		        	nextBtn: false
+		        });
+		    }
+		    //将后来的数据push
+		    Array.prototype.push.apply(state.data, data);
+		    state.page = ++state.page;
+		    this.setState({
+		    	loadMsg: '加载成功',
+		    	loadAnimation: false,
+		    	page: state.page,
+		    	data: state.data
+		    });
+		}
+
+		/**
+		 * 请求失败时
+		 */
+		this.error = () => {
+		    this.state.loadAnimation = false;
+		    this.state.loadMsg = '加载失败';
+		    this.props.setState(this.state);
 		}
 		this.initState(this.props);
 	}
@@ -106,10 +165,12 @@ class IndexList extends Component {
 		var main = data ? <List list={data} /> : null;
 		return (
 			<div>
-				<Nav tab={tab}/>
-				{ main } 
-
-				<Footer index="0"/>
+				<div className="index-list-box">
+					<Nav tab={tab}/>
+					{ main } 
+					<Footer index="0"/>
+				</div>
+				<div ref="dataload"><DataLoad loadAnimation={loadAnimation} loadMsg={loadMsg} /></div> 
 			</div>
 		)
 	}
