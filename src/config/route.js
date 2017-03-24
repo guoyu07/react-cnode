@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Router, Route, IndexRoute, browserHistory, hashHistory } from 'react-router';
 
 //import component
-import IndexList from '../components/IndexList'
+import IndexList from '../container/IndexList'
 import TopicPost from '../components/TopicPost'
 import Topic from '../components/Topic'
 import MyMessage from '../components/MyMessage'

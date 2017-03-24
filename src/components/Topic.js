@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import action from '../actions';
 import { Lib, merged } from '../lib/lib';
-import { DataLoad, Footer, UserHeadImg, TabIcon, Header } from './common/index';
+import { DataLoad, Footer, UserHeadImg, TabIcon, Header, TipMsgSignIn } from './common/index';
 /**
  * Topic
  */
@@ -30,13 +30,11 @@ class Topic extends  Component {
 				data: data
 			};
 			Lib.get(options.url,options.data,(res) => {
-				this.setState({
-					loadMsg: '加载成功',
-					loadAnimation: false,
-					data: res.data
-				});
-				//dispatch 改变状态
-				//this.props.SET_STATE(this.state);
+				this.state.loadMsg = '加载成功';
+				this.state.data = res.data;
+				this.state.loadAnimation = false;
+				//dispatch 改变 props
+				this.props.SET_STATE(this.state);
 			},(res,xhr) => { 
 				if (xhr.status == 404) {
 				    this.setState({
@@ -50,7 +48,7 @@ class Topic extends  Component {
 				    });
 				}
 				//dispatch 改变状态
-				//this.props.SET_STATE(this.state);
+				this.props.SET_STATE(this.state);
 			});
 		}
 		this.reqData = (props, state) => {
@@ -61,7 +59,7 @@ class Topic extends  Component {
 			//记录滚动条的位置
 			this.state.scrollX = window.scrollX;
 			this.state.scrollY = window.scrollY;
-			//dispatch 改变状态
+			//dispatch 改变 props
 			this.props.SET_STATE(this.state);
 		}
 		/**
@@ -90,9 +88,10 @@ class Topic extends  Component {
 				} else { //点赞
 					ups.push(uid);
 				}
-				this.setState({data: state.data});
+				//this.setState({data: state.data});
+				this.props.SET_STATE(state);
 			},(res) => { 
-				//this.props.SET_STATE(this.props.state);
+				this.props.SET_STATE(state);
 			});
 		}
 		/**
@@ -106,11 +105,12 @@ class Topic extends  Component {
 				return this.context.router.push({pathname: '/signin'});
 			}
 			--index;
-			if(this.props.list[index].display === 'block') {
-				this.props.list[index].display === 'none';
+			if(this.props.state.data.data.replies[index].display === 'block') {
+				this.props.state.data.data.replies[index].display = 'none';
 			} else {
-				this.props.list[index].display === 'block'
+				this.props.state.data.data.replies[index].display = 'block';
 			}
+			this.props.SET_STATE(this.props.state.data);
 		}
 		/**
 		 * 重新加载数据
@@ -118,9 +118,9 @@ class Topic extends  Component {
 		 * @return {[type]}      [description]
 		 */
 		this.reLoadData = (data) => {
-			//this.props.state.data = data;
-			//this.props.SET_STATE(this.props.state);
-			this.setState({data: data});
+			//this.initState(this.props);
+			this.props.state.data.data = data;
+			this.props.SET_STATE(this.props.state.data);
 		}
 		this.initState(this.props);
 	}
@@ -135,19 +135,19 @@ class Topic extends  Component {
 	    if (this.path !== path) {
 	        this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
 	    }
-	    this.initState(np);
+	    //this.initState(np);
 	}
 	componentDidUpdate() {
 		//组件更新之后重新获取数据
-	    //this.getData();
+	    //this.getData(prevProps,prevState);
 	}
-	componentWillUnmount() {
-	    this.unMount(); //地址栏已经发生改变，做一些卸载前的处理
-	}
+	// componentWillUnmount() {
+	    
+	// }
 
 	render() {
-		var { data, loadAnimation, loadMsg, id } = this.state;
-		var main = data ? <Article {...this.state} reLoadData={this.reLoadData} clickZan={this.clickZan} showReplyBox={this.showReplyBox}/> : <DataLoad loadMsg={loadMsg} loadAnimation={loadAnimation}/>;
+		var { data, loadAnimation, loadMsg, id } = this.props.state.data;
+		var main = data ? <Article {...this.props} reLoadData={this.reLoadData} clickZan={this.clickZan} showReplyBox={this.showReplyBox}/> : <DataLoad loadMsg={loadMsg} loadAnimation={loadAnimation}/>;
 		return (
 			<div>
 				<Header leftIcon="fanhui" title="详情"/>
@@ -169,7 +169,8 @@ class Article extends Component {
 	}
 	render() {
 		
-		var { author,create_at,visit_count,reply_count,title,id,content,replies } = this.props.data;
+		var { author,create_at,visit_count,reply_count,title,id,content,replies } = this.props.state.data.data;
+		var bottom = this.props.User ? <ReplyBox reLoadData={this.props.reLoadData} data={{ accesstoken: this.props.User.accesstoken, id }} /> : <TipMsgSignIn />;
 		var createMarkup = () => {
 		    return {
 		        __html: content
@@ -187,7 +188,7 @@ class Article extends Component {
 							<time data-flex-box="1">{Lib.formatDate(create_at)}</time>
 							<div className="lou">#楼主</div>
 							<div className="font" data-flex="main: center cross: center">
-								<TabIcon {...this.props.data} />
+								<TabIcon {...this.props.state.data.data} />
 							</div>
 						</div>
 						<div className="qt" data-flex>
@@ -199,7 +200,8 @@ class Article extends Component {
 				<h2 className="tit2">{title}</h2>
 				<div className="content markdown-body" dangerouslySetInnerHTML={createMarkup()}></div>
 				<h3 className="tit3">共<em>{replies.length}</em>条回复</h3>
-				<ReplyList reLoadData={this.reLoadData} list={replies} id={id} clickZan={this.props.clickZan} showReplyBox={this.props.showReply} User={this.props.User} />
+				<ReplyList reLoadData={this.props.reLoadData} list={replies} id={id} clickZan={this.props.clickZan} showReplyBox={this.props.showReplyBox} User={this.props.User} />
+				{bottom}
 			</div>
 		)
 	}
@@ -287,15 +289,16 @@ class ReplyBox extends Component {
 			data.content += '\n\r[from react cnode 手机版](https://github.com/hitao123/react-cnode)';
 			Lib.post(`/api/v1/topic/${data.id}/replies`, data, (res) => {
 				this.setState({ btnname: '回复成功'});
+				this.refs.content.value = '';
 				//重新获取评论列表
-				Lib.get(`/api/v1//topic/${data.id}`,{}, (res) => {
+				Lib.get(`/api/v1/topic/${data.id}`,{}, (res) => {
 					this.props.reLoadData(res.data); //刷新
-					this.setState({ btnname: '回复'});
+					this.state.btnname = '回复';
 				}, (res) => {
-					this.setState({ btnname: '刷新失败，请重试'});
-				})
+					this.state.btnname = '刷新失败，请重试';
+				});
 			}, (res) => {
-				this.setState({ btnname: '回复失败'});
+				this.state.btnname = '回复失败';
 			});
 		}
 	}
@@ -307,7 +310,7 @@ class ReplyBox extends Component {
 					<textarea ref="content" placeholder={ this.props.placeholder }></textarea>
 				</div>
 				<div data-flex="main:right">
-					<button className="btn" onClick= { this.submit }>{this.state.btnname}</button>
+					<button className="btn" onClick= { () => {this.submit()} }>{this.state.btnname}</button>
 				</div>
 			</div>
 		)

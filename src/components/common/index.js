@@ -179,14 +179,14 @@ class FooterInit extends Component {
 	componentDidMount() {
 		this.getMessageCount();	
 	}
-	// /**
-	//  * 防止组件不必要的更新
-	//  */
-	// shouldComponentUpdate(nextProps, nextState) {
-	// 	return this.props.index !== nextProps.index || this.state.messageCount !== nextState.messageCount; 
-	// }
+	/**
+	 * 防止组件不必要的更新
+	 */
+	shouldComponentUpdate(nextProps, nextState) {
+		return this.props.index !== nextProps.index || this.state.messageCount !== nextState.messageCount; 
+	}
 	componentDidUpdate(prevProps, prevState) {
-		//this.getMessageCount();
+		this.getMessageCount();
 	}
 }
 
