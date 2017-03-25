@@ -11,45 +11,17 @@
 
 #### 知识点
 
-1. ES6 module 
-
-```export与export default
-   //export class IndexList extends Component{}
-   导出
-   import { IndexList } from './index.js'
-   //export  default class IndexList extends Component{}
-   导出
-   import IndexList/anyName from './index.js'
-
-   2. import IndexList from './common'
-   这种写法会自动去寻找 common 目录下 index 文件，(后缀省略是在webpack里面配置的)
-   resolve: {
-       extensions: ['', '.js', '.jsx'], //后缀名自动补全
-   }
-```
-
-2. react的几种写法区别
-
-```
-
-```
-
-3. 路由按需加载
+1. webpack 1.0 配置
 
 ```
 ```
 
-4. webpack 1.0 配置
+2. flex 布局
 
 ```
 ```
 
-5. flex 布局
-
-```
-```
-
-6. 获取下一页数据
+3. 获取下一页数据
 
 ```
 ```
